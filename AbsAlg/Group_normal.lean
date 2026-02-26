@@ -16,54 +16,54 @@ def IsNormal {G : Type*} [Group G] (H : Set G) : Prop :=
   IsSubgroup H ∧ ∀ g h, H h → H (g * h * g⁻¹)
 
 /-
-Definition of the left coset relation and proof that it is an equivalence relation.
+We use equivalence relation to define left coset. The def below doesn't require H ≤ G yet.
 -/
 def LeftCosetRel {G : Type*} [Group G] (H : Set G) (x y : G) : Prop :=
   H (x⁻¹ * y)
 
+/-
+Now we need H ≤ G to see this is an equivalence relation.
+-/
 theorem LeftCosetRel_equiv {G : Type*} [Group G]
     (H : Set G) (hH : IsSubgroup H) : Equivalence (LeftCosetRel H) := by
-  constructor <;> intro x <;>
-  simp_all only [LeftCosetRel, inv_mul_cancel]
-  · exact hH.1;
-  · exact fun { y } hy => by simpa [ mul_assoc ] using hH.2.2 ( x⁻¹ * y ) hy; ;
-  · -- By the closure property of subgroups, the product of two elements in H is also in H.
-    intros y z hy hz
+  constructor
+  · simp_all only [LeftCosetRel, inv_mul_cancel]
+    intro x
+    exact hH.1
+  · intro x
+    exact fun { y } hy => by simpa [ mul_assoc ] using hH.2.2 ( x⁻¹ * y ) hy
+  · intros x y z hy hz
     have h_prod : H ((x⁻¹ * y) * (y⁻¹ * z)) := by
-      exact hH.2.1 _ _ hy hz;
+      exact hH.2.1 _ _ hy hz
     simpa [ mul_assoc ] using h_prod
 
 /-
-Definition of the Setoid structure on G determined by the left coset relation of H.
+Definition of the Setoid ("equivalence class") structure on G by left cosets of H.
 -/
 def LeftCosetSetoid {G : Type*} [Group G] (H : Set G) (hH : IsSubgroup H) : Setoid G :=
   { r := LeftCosetRel H, iseqv := LeftCosetRel_equiv H hH }
 
 /-
 Theorem stating that multiplication is well-defined on the quotient by a normal subgroup.
+That is, if aH = a'H and bH = b'H, then abH = a'b'H.
 -/
 theorem mul_well_defined {G : Type*} [Group G] (H : Set G) (hH : IsSubgroup H) (hN : IsNormal H)
     (a b a' b' : G) (ha : LeftCosetRel H a a') (hb : LeftCosetRel H b b') :
     LeftCosetRel H (a * b) (a' * b') := by
-      -- By definition of normality, we know that for any $g \in G$ and $h \in H$,
-      -- $g * h * g⁻¹ \in H$.
       have h_normal : ∀ g h, H h → H (g * h * g⁻¹) := by
-        exact hN.2;
-      -- By definition of normality, we know that for any $g \in G$ and $h \in H$,
-      -- $g * h * g⁻¹ \in H$. Therefore, we can write $a' = a * h_a$ and $b' = b * h_b$
-      -- for some $h_a, h_b \in H$.
+        exact hN.2
       obtain ⟨h_a, ha_eq⟩ : ∃ h_a, a' = a * h_a ∧ H h_a := by
         exact ⟨ a⁻¹ * a', by group, ha ⟩
       obtain ⟨h_b, hb_eq⟩ : ∃ h_b, b' = b * h_b ∧ H h_b := by
-        exact ⟨ b⁻¹ * b', by group, by simpa using hb ⟩;
-      simp_all only [LeftCosetRel, inv_mul_cancel_left, mul_assoc, mul_inv_rev];
-      convert hH.2.1 _ _ ( h_normal b⁻¹ h_a ha_eq.2 ) ( hb_eq.2 ) using 1 ; group
+        exact ⟨ b⁻¹ * b', by group, by simpa using hb ⟩
+      simp_all only [LeftCosetRel, inv_mul_cancel_left, mul_assoc, mul_inv_rev]
+      convert hH.2.1 _ _ ( h_normal b⁻¹ h_a ha_eq.2 ) ( hb_eq.2 ) using 1
+      group
 
 /-
 Definition of the quotient group type and its multiplication operation,
 using a local instance for the setoid.
 -/
-
 def MyQuotientGroup {G : Type*} [Group G] (H : Set G) (hH : IsSubgroup H) :=
     Quotient (LeftCosetSetoid H hH)
 
@@ -76,31 +76,24 @@ def MyQuotientGroup.mul {G : Type*} [Group G] (H : Set G) (hH : IsSubgroup H) (h
   Quotient.lift₂ (fun x y => MyQuotientGroup.mk H hH (x * y))
     (fun a b a' b' ha hb => Quotient.sound (mul_well_defined H hH hN a b a' b' ha hb))
 
-/-
-Definition of the identity element and inverse operation for the quotient group.
--/
 def MyQuotientGroup.one {G : Type*} [Group G] (H : Set G) (hH : IsSubgroup H) :
   MyQuotientGroup H hH :=  MyQuotientGroup.mk H hH 1
 
 def MyQuotientGroup.inv {G : Type*} [Group G] (H : Set G) (hH : IsSubgroup H) (hN : IsNormal H) :
     MyQuotientGroup H hH → MyQuotientGroup H hH :=
   letI : Setoid G := LeftCosetSetoid H hH
-  Quotient.lift (fun x => MyQuotientGroup.mk H hH x⁻¹) (fun a b hab => Quotient.sound (by
-  -- Since $a \equiv b$, there exists $h \in H$ such that $a^{-1}b = h$. Taking inverses,
-  -- we get $b^{-1}a = h^{-1}$, which is also in $H$ because $H$ is closed under inverses.
+  Quotient.lift (fun x => MyQuotientGroup.mk H hH x⁻¹)
+  (fun a b hab => Quotient.sound (by
   obtain ⟨h, hh⟩ : ∃ h ∈ H, a⁻¹ * b = h := by
-    exact ⟨ _, hab, rfl ⟩;
-  -- Since $h \in H$, we have $h^{-1} \in H$ because $H$ is closed under inverses.
+    exact ⟨ _, hab, rfl ⟩
   have h_inv : h⁻¹ ∈ H := by
     exact hH.2.2 _ hh.1;
-  -- Since $a⁻¹ * b = h$, we can rewrite $b$ as $a * h$.
-  -- Taking inverses on both sides, we get $b⁻¹ = (a * h)⁻¹ = h⁻¹ * a⁻¹$.
   have hb_inv : b⁻¹ = h⁻¹ * a⁻¹ := by
-    simp +decide [ ← hh.2, mul_assoc ];
-  -- Since $h⁻¹ \in H$, we have $(a⁻¹)⁻¹ * b⁻¹ = a * b⁻¹ \in H$.
+    simp [ ← hh.2, mul_assoc ]
   have h_mul : (a⁻¹)⁻¹ * b⁻¹ ∈ H := by
-    have := hN.2 a ( h⁻¹ ) h_inv; simp_all only [mul_assoc, inv_inv] ;
-    exact this;
+    have := hN.2 a ( h⁻¹ ) h_inv
+    simp_all only [mul_assoc, inv_inv]
+    exact this
   exact h_mul))
 
 /-

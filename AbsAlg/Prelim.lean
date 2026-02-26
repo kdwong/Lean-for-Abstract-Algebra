@@ -35,6 +35,20 @@ theorem division_algorithm (a b : ℤ) (hb : b > 0) :
     · exact hq
     · exact hr
 
+-- Euclidean Algorithm
+def euclid_alg (x y : ℤ) : ℤ :=
+  if h : y = 0 then
+    x.natAbs
+  else
+    euclid_alg y (x % y)
+termination_by y.natAbs
+decreasing_by
+rw [ ← Int.ofNat_lt, Int.natAbs_of_nonneg ( Int.emod_nonneg _ h ) ]
+exact Int.emod_lt _ h
+
+#eval euclid_alg 18 123
+
+
 -- Bézout's Theorem
 theorem bezout_int (x y : ℤ) : ∃ a b : ℤ, a * x + b * y = Int.gcd x y := by
   exact Int.gcd_eq_gcd_ab x y ▸ ⟨ Int.gcdA x y, Int.gcdB x y, by ring ⟩
