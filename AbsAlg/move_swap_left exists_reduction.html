@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="Lean Proof Explanation: Permutation Swap Lemmas">
+    <meta property="og:description" content="Interactive line-by-line explanation of two Lean proofs about permutation swaps">
+    <meta property="og:image" content="https://cdn.simulationtheory.ai/gasset/?asset=img&prompt=mathematical proof diagram with arrows and symbols&w=64&h=64&style=professional">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="https://cdn.simulationtheory.ai/gasset/?asset=img&prompt=lambda symbol mathematics&w=32&h=32&style=professional">
+    <title>Lean Proof Explanation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="/chat/cdn/animate.min.css" rel="stylesheet">
+    <style>
+        .proof-line {
+            transition: all 0.2s ease;
+        }
+        .proof-line:hover {
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+        .code-block {
+            font-family: 'Courier New', monospace;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+        }
+        .keyword { color: #569cd6; }
+        .type { color: #4ec9b0; }
+        .variable { color: #9cdcfe; }
+        .comment { color: #6a9955; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .operator { color: #d4d4d4; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <div class="text-center mb-12 animate__animated animate__fadeInDown">
+            <h1 class="text-5xl font-bold text-slate-800 mb-4">
+                <span class="text-blue-600">Lean Proof</span> Explanation
+            </h1>
+            <p class="text-xl text-slate-600">Line-by-line analysis of permutation swap lemmas</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden animate__animated animate__fadeInUp">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-6">
+                <h2 class="text-3xl font-bold text-white flex items-center gap-3">
+                    <span class="bg-white text-blue-600 rounded-lg px-3 py-1">1</span>
+                    Lemma: move_swap_left
+                </h2>
+                <p class="text-blue-100 mt-2">Strategy: Case analysis to move a swap to the left of a product</p>
+            </div>
+            
+            <div class="p-8">
+                <div class="bg-blue-50 border-l-4 border-blue-600 p-6 mb-6 rounded-r-lg">
+                    <h3 class="text-xl font-bold text-blue-900 mb-3">Overview</h3>
+                    <p class="text-slate-700 leading-relaxed">
+                        This lemma shows that given a swap σ and swap(a,b), their product can either cancel to identity, 
+                        or be rewritten as swap(a,z) * τ where τ fixes a. This is crucial for manipulating products of swaps.
+                    </p>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="proof-line p-4 rounded-lg border border-slate-200">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code><span class="keyword">rcases</span> hσ <span class="keyword">with</span> ⟨x, y, hxy, <span class="keyword">rfl</span>⟩</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Destructure the swap hypothesis<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> Since σ.IsSwap, we know σ = swap(x,y) for some x≠y. 
+                            We extract x, y, the proof x≠y (hxy), and substitute σ with swap(x,y) (rfl).
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code><span class="keyword">by_cases</span> h : <span class="function">swap</span> x y = <span class="function">swap</span> a b</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Case split on equality<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> First check if σ is exactly the swap we're multiplying with. 
+                            This is the cancellation case.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-green-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>· <span class="keyword">left</span>; <span class="keyword">rw</span> [h, <span class="function">Equiv.swap_mul_self</span>]</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Prove cancellation<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> If σ = swap(a,b), then σ * swap(a,b) = swap(a,b) * swap(a,b) = 1. 
+                            Choose the left disjunct (cancellation case) and apply the theorem that a swap composed with itself is identity.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>· <span class="keyword">right</span></code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Handle non-cancellation cases<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> If σ ≠ swap(a,b), we need to prove the right disjunct: 
+                            find z and τ such that σ * swap(a,b) = swap(a,z) * τ with τ fixing a.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code><span class="keyword">if</span> ha : x = a ∨ y = a <span class="keyword">then</span></code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Case analysis on whether σ involves 'a'<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> If swap(x,y) involves element 'a', we can directly rewrite it as swap(a,z) for some z.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-yellow-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code><span class="keyword">obtain</span> ⟨z, hza, heq⟩ : ∃ z, z ≠ a ∧ <span class="function">swap</span> x y = <span class="function">swap</span> a z := <span class="keyword">by</span>
+  <span class="keyword">cases</span> ha <span class="keyword">with</span>
+  | inl hxa => <span class="keyword">subst</span> hxa; <span class="keyword">exact</span> ⟨y, hxy.symm, <span class="keyword">rfl</span>⟩
+  | inr hya => <span class="keyword">subst</span> hya; <span class="keyword">exact</span> ⟨x, hxy, <span class="function">Equiv.swap_comm</span> ..⟩</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Normalize the swap to have 'a' as first element<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> If x=a, then swap(x,y) = swap(a,y), so z=y. 
+                            If y=a, then swap(x,y) = swap(y,x) = swap(a,x), so z=x. We use swap commutativity.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code><span class="keyword">rw</span> [heq]</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Substitute<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> Replace swap(x,y) with swap(a,z) in the goal.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code><span class="keyword">have</span> hzb : z ≠ b := <span class="keyword">by</span> <span class="keyword">intro</span> hb; <span class="keyword">subst</span> hb; <span class="keyword">apply</span> h; <span class="keyword">rw</span> [heq]</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Prove z≠b by contradiction<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> If z=b, then swap(x,y) = swap(a,b), contradicting our assumption h that they're different.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-purple-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code><span class="keyword">refine</span> ⟨b, hab.symm, <span class="function">swap</span> b z, ⟨b, z, <span class="keyword">by</span> aesop, <span class="keyword">rfl</span>⟩, ?_, ?_⟩</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Construct the witness structure<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> We provide the existential witnesses: z=b (satisfying z≠a via hab.symm), 
+                            τ=swap(b,z) (proven to be a swap via ⟨b, z, proof of b≠z, rfl⟩). Two sub-goals remain: prove τ(a)=a and the main equality.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-purple-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>· <span class="keyword">simp</span> [swap_apply_def]; aesop</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Prove τ(a) = a<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> Simplify swap(b,z)(a) using the definition of swap application. 
+                            Since a≠b and a≠z (from our case analysis), swap(b,z) leaves a unchanged. Automation (aesop) finishes.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-purple-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>· <span class="keyword">rw</span> [swap_mul_swap_share_left hzb hza]</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Apply swap multiplication identity<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> Use the algebraic identity: swap(a,z) * swap(a,b) = swap(a,b) * swap(b,z). 
+                            This proves the required equality σ * swap(a,b) = swap(a,z) * τ.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code><span class="keyword">else if</span> hb : x = b ∨ y = b <span class="keyword">then</span></code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Case where σ involves 'b' but not 'a'<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> Similar to the 'a' case but now we normalize to swap(b,z). 
+                            The algebra is slightly different but follows the same pattern.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-yellow-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code><span class="keyword">obtain</span> ⟨z, hzb, heq⟩ : ∃ z, z ≠ b ∧ <span class="function">swap</span> x y = <span class="function">swap</span> b z := <span class="keyword">by</span>
+  <span class="keyword">cases</span> hb <span class="keyword">with</span>
+  | inl hxb => <span class="keyword">subst</span> hxb; <span class="keyword">exact</span> ⟨y, hxy.symm, <span class="keyword">rfl</span>⟩
+  | inr hyb => <span class="keyword">subst</span> hyb; <span class="keyword">exact</span> ⟨x, hxy, <span class="function">Equiv.swap_comm</span> ..⟩</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Normalize to swap(b,z)<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> Same technique as before, but with 'b' instead of 'a'. 
+                            Extract z such that swap(x,y) = swap(b,z).
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code><span class="keyword">rw</span> [heq]</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Substitute<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> Replace swap(x,y) with swap(b,z) in the goal.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code><span class="keyword">have</span> hza : z ≠ a := <span class="keyword">by</span>
+  <span class="keyword">intro</span> Hz; <span class="keyword">subst</span> Hz; <span class="keyword">cases</span> hb <;> grind</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Prove z≠a<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> If z=a, we'd have swap(x,y) involving 'a', contradicting that σ doesn't involve 'a' (from earlier negation of ha).
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-purple-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code><span class="keyword">refine</span> ⟨z, hza, <span class="function">swap</span> z b, ⟨z, b, hzb, <span class="keyword">rfl</span>⟩, ?_, ?_⟩</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Construct witness for 'b' case<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> Provide witnesses: z (satisfying z≠a), τ=swap(z,b) (proven to be a swap). 
+                            Two sub-goals remain.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-purple-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>· <span class="keyword">simp</span> [swap_apply_def]; aesop</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Prove τ(a) = a<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> Show swap(z,b)(a) = a by case analysis. Since a≠z and a≠b, the swap leaves a fixed.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-purple-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>· <span class="keyword">rw</span> [swap_mul_swap_share_right hza hzb hab]</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Apply different swap identity<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> Use the identity swap(b,z) * swap(a,b) = swap(a,z) * swap(z,b). 
+                            This is the version for swaps sharing the right element.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code><span class="keyword">else</span>
+<span class="keyword">push_neg</span> <span class="keyword">at</span> ha hb</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Handle disjoint case<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> If σ involves neither 'a' nor 'b', convert the negated disjunctions 
+                            into explicit inequalities: x≠a, y≠a, x≠b, y≠b.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code><span class="keyword">have</span> hdisj : Disjoint ({a, b} : Set α) {x, y} := <span class="keyword">by</span>
+  <span class="keyword">rw</span> [Set.disjoint_insert_left, Set.disjoint_singleton_left]
+  aesop</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Prove disjointness formally<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> Show {a,b} ∩ {x,y} = ∅ using set theory lemmas. 
+                            This follows from x,y being different from both a and b.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-purple-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code><span class="keyword">refine</span> ⟨b, hab.symm, <span class="function">swap</span> x y, ⟨x, y, hxy, <span class="keyword">rfl</span>⟩, ?_, ?_⟩</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Construct witness for disjoint case<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> Use z=b and τ=swap(x,y) (which is just σ itself). 
+                            Since σ is disjoint from {a,b}, it automatically fixes a.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-purple-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>· <span class="keyword">simp</span> [swap_apply_def]; aesop</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Prove τ(a) = a<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> Since swap(x,y) is disjoint from {a,b}, it fixes a.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-purple-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>· <span class="keyword">rw</span> [swap_mul_swap_comm_of_disjoint hdisj]</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Apply commutativity of disjoint swaps<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> Disjoint swaps commute: swap(x,y) * swap(a,b) = swap(a,b) * swap(x,y). 
+                            This gives us the required form.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden animate__animated animate__fadeInUp animate__delay-1s">
+            <div class="bg-gradient-to-r from-purple-600 to-pink-600 p-6">
+                <h2 class="text-3xl font-bold text-white flex items-center gap-3">
+                    <span class="bg-white text-purple-600 rounded-lg px-3 py-1">2</span>
+                    Lemma: exists_reduction
+                </h2>
+                <p class="text-purple-100 mt-2">Strategy: Induction on list of swaps to reduce or move a final swap</p>
+            </div>
+            
+            <div class="p-8">
+                <div class="bg-purple-50 border-l-4 border-purple-600 p-6 mb-6 rounded-r-lg">
+                    <h3 class="text-xl font-bold text-purple-900 mb-3">Overview</h3>
+                    <p class="text-slate-700 leading-relaxed">
+                        Given a list M of swaps and a swap (a,b), this lemma shows that M·(a,b) can either be reduced 
+                        (by canceling two swaps) or rewritten as (a,z)·M' where M' fixes 'a'. This is the key step for 
+                        proving that permutations can be written as products of swaps with special structure.
+                    </p>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="proof-line p-4 rounded-lg border border-slate-200">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code><span class="keyword">induction</span> M <span class="keyword">using</span> List.reverseRecOn <span class="keyword">generalizing</span> a b</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Reverse induction on the list<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> We induct on M from right to left (reverse recursion). 
+                            This lets us interact the rightmost swap of M with swap(a,b). We generalize over a,b since they change in the recursive call.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-green-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code><span class="keyword">case</span> nil =>
+  <span class="keyword">right</span></code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Base case when M is empty<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> If M=[], choose the "move" disjunct (right).
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-green-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>  <span class="keyword">refine</span> ⟨b, hab.symm, [], <span class="keyword">by</span> <span class="keyword">simp</span>, <span class="keyword">by</span> <span class="keyword">simp</span>⟩</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Provide trivial witnesses<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> M·swap(a,b) = swap(a,b) = swap(a,b)·1. 
+                            Use z=b and M'=[] (empty list). The empty list trivially consists of swaps fixing a, and the product is correct.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code><span class="keyword">case</span> append_singleton L s ih =></code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Inductive case M = L ++ [s]<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> By reverse induction, M splits as L ++ [s] where s is the last swap. 
+                            We have induction hypothesis 'ih' for L.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code><span class="keyword">have</span> hs : s.IsSwap := <span class="keyword">by</span> simp_all</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Extract that s is a swap<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> From h_swaps (all elements of M are swaps), derive that s is a swap.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code><span class="keyword">have</span> hL_swaps : ∀ x ∈ L, x.IsSwap := <span class="keyword">by</span> simp_all</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Extract that all elements of L are swaps<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> Similarly, derive that all elements of L are swaps.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-yellow-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code><span class="keyword">rcases</span> move_swap_left hab s hs <span class="keyword">with</span> h_cancel | ⟨z, hza, τ, hτ_swap, hτ_fix, h_comm⟩</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Apply the first lemma<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> Use move_swap_left on s and swap(a,b). 
+                            This gives two cases: either they cancel (h_cancel: s*swap(a,b)=1), or we get s·swap(a,b) = swap(a,z)·τ with τ(a)=a.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-green-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>· <span class="keyword">left</span></code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Cancellation case - choose reduction<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> If s·swap(a,b)=1, we have a reduction.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-green-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>  <span class="keyword">refine</span> ⟨L, <span class="keyword">by</span> <span class="keyword">simp</span>, hL_swaps, ?_⟩</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Construct reduced list<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> The reduced list is M'=L. Check: |L| + 2 = |L++[s]| + 1 = |M| + 1 ✓. 
+                            All elements are swaps (hL_swaps). One sub-goal remains: prove the products are equal.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-green-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>  <span class="keyword">simp</span> [List.prod_append, h_cancel]</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Prove product equality<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> (L++[s]++[swap(a,b)]).prod = L.prod · s · swap(a,b) = L.prod · 1 = L.prod. 
+                            Simplification with the cancellation fact completes the proof.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>· <span class="keyword">specialize</span> ih a z hza.symm hL_swaps</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Apply induction hypothesis<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> We have s·swap(a,b) = swap(a,z)·τ. 
+                            So (L++[s])·swap(a,b) = L·swap(a,z)·τ. Apply IH to L and swap(a,z) (note: z≠a from hza.symm).
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>  <span class="keyword">rcases</span> ih <span class="keyword">with</span> ⟨L', hlen, hops', hprod⟩ | ⟨w, hwa, L', hops', hprod⟩</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Case split on IH result<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> The IH gives two subcases: either L·swap(a,z) reduces to L' (shorter list), 
+                            or it moves to swap(a,w)·L' with L' fixing a.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-green-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>  · <span class="keyword">left</span></code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Subcase 2a - reduction propagates<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> If L·swap(a,z) reduces, we get a reduction for the whole expression.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-green-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>    <span class="keyword">refine</span> ⟨L' ++ [τ], ?_, ?_, ?_⟩</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Construct reduced list<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> The reduced list is L'++[τ]. Three sub-goals: length, all swaps, product equality.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-green-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>    · <span class="keyword">simp</span> [List.length_append]; omega</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Verify length<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> |L'++[τ]| + 2 = |L'| + 1 + 2 = (|L|-2) + 1 + 2 = |L| + 1 = |M| + 1 ✓. 
+                            Arithmetic solver (omega) handles this.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-green-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>    · <span class="keyword">intro</span> x hx
+      <span class="keyword">rw</span> [List.mem_append, List.mem_singleton] <span class="keyword">at</span> hx</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Prove all elements are swaps<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> Take arbitrary x in L'++[τ]. Either x∈L' or x=τ.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-green-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>      <span class="keyword">rcases</span> hx <span class="keyword">with</span> hx | <span class="keyword">rfl</span>
+      · <span class="keyword">exact</span> hops' x hx
+      · <span class="keyword">exact</span> hτ_swap</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Handle both cases<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> If x∈L', it's a swap by IH (hops'). If x=τ, it's a swap by construction (hτ_swap).
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-green-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>    · <span class="keyword">simp</span> [List.prod_append, h_comm, mul_assoc, hprod]</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Prove product equality<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> (L'++[τ]).prod = L'.prod · τ = L'.prod · τ (by IH: L'.prod = L·swap(a,z)) 
+                            = L·swap(a,z)·τ (by h_comm: = L·s·swap(a,b)) = (M++[swap(a,b)]).prod ✓
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-green-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>  · <span class="keyword">right</span></code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Subcase 2b - move propagates<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> If L·swap(a,z) moves to swap(a,w)·L', propagate the move.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-green-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>    <span class="keyword">refine</span> ⟨w, hwa, L' ++ [τ], ?_, ?_⟩</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Construct moved form<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> Use witness w (from IH, w≠a) and list L'++[τ]. Two sub-goals: all elements are swaps fixing a, and product equality.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-green-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>    · <span class="keyword">intro</span> x hx
+      <span class="keyword">rw</span> [List.mem_append, List.mem_singleton] <span class="keyword">at</span> hx</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Prove all elements fix a<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> Take arbitrary x in L'++[τ]. Either x∈L' or x=τ.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-green-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>      <span class="keyword">rcases</span> hx <span class="keyword">with</span> hx | <span class="keyword">rfl</span>
+      · <span class="keyword">exact</span> hops' x hx
+      · <span class="keyword">exact</span> ⟨hτ_swap, hτ_fix⟩</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Handle both cases<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> If x∈L', it's a swap fixing a by IH. If x=τ, it's a swap fixing a by construction (hτ_fix).
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-green-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>    · <span class="keyword">simp only</span> [List.prod_append, List.prod_singleton] <span class="keyword">at</span> hprod ⊢</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Simplify products<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> Expand list products into multiplications in both the IH (hprod) and the goal.
+                        </div>
+                    </div>
+
+                    <div class="proof-line p-4 rounded-lg border border-slate-200 bg-green-50">
+                        <div class="code-block p-4 rounded-lg mb-3 overflow-x-auto">
+                            <code>      <span class="keyword">rw</span> [mul_assoc, h_comm, ← mul_assoc, hprod, mul_assoc]</code>
+                        </div>
+                        <div class="text-slate-700">
+                            <span class="font-semibold text-blue-600">Strategy:</span> Algebraic manipulation<br>
+                            <span class="font-semibold text-green-600">Explanation:</span> Chain of equalities: (M++[swap(a,b)]).prod = L·s·swap(a,b) 
+                            = L·(swap(a,z)·τ) (by h_comm) = (L·swap(a,z))·τ (reassociate) = (swap(a,w)·L'.prod)·τ (by hprod) 
+                            = swap(a,w)·(L'.prod·τ) = swap(a,w)·(L'++[τ]).prod ✓
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-purple-50 border-l-4 border-purple-600 p-6 mt-8 rounded-r-lg">
+                    <h3 class="text-xl font-bold text-purple-900 mb-3">Proof Summary</h3>
+                    <p class="text-slate-700 leading-relaxed mb-4">
+                        The proof works by reverse induction on the list M:
+                    </p>
+                    <ul class="list-disc list-inside text-slate-700 space-y-2 ml-4">
+                        <li><strong>Base case (M=∅):</strong> Trivially a "move" case with empty list</li>
+                        <li><strong>Inductive step (M=L++[s]):</strong> Use move_swap_left to interact s with swap(a,b):
+                            <ul class="list-circle list-inside ml-6 mt-2 space-y-1">
+                                <li><strong>If they cancel:</strong> Reduction directly to L</li>
+                                <li><strong>If they transform:</strong> Get s·swap(a,b) = swap(a,z)·τ, then:
+                                    <ul class="list-square list-inside ml-6 mt-1 space-y-1">
+                                        <li>Apply IH to L·swap(a,z)</li>
+                                        <li>If IH gives reduction: append τ to get reduced list</li>
+                                        <li>If IH gives move: append τ to get moved list</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <p class="text-slate-700 leading-relaxed mt-4">
+                        The key insight is that move_swap_left always makes progress: either immediate cancellation, 
+                        or transformation to a form where we can recurse on a structurally simpler problem.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl shadow-xl p-8 text-white animate__animated animate__fadeInUp animate__delay-2s">
+            <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+                Key Proof Strategies
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-slate-700 rounded-xl p-6">
+                    <h3 class="text-xl font-bold mb-3 text-blue-300">1. Case Analysis</h3>
+                    <p class="text-slate-200">
+                        Both proofs heavily use case splitting (by_cases, if-then-else, rcases) to handle different 
+                        structural situations. This breaks complex problems into manageable pieces.
+                    </p>
+                </div>
+                
+                <div class="bg-slate-700 rounded-xl p-6">
+                    <h3 class="text-xl font-bold mb-3 text-green-300">2. Algebraic Identities</h3>
+                    <p class="text-slate-200">
+                        Key swap identities (cancellation, commutativity for disjoint swaps, transformation rules) 
+                        are applied strategically to simplify products.
+                    </p>
+                </div>
+                
+                <div class="bg-slate-700 rounded-xl p-6">
+                    <h3 class="text-xl font-bold mb-3 text-purple-300">3. Induction Pattern</h3>
+                    <p class="text-slate-200">
+                        Reverse induction on lists allows processing from right to left, perfect for interacting 
+                        the last element with a new swap.
+                    </p>
+                </div>
+                
+                <div class="bg-slate-700 rounded-xl p-6">
+                    <h3 class="text-xl font-bold mb-3 text-yellow-300">4. Witness Construction</h3>
+                    <p class="text-slate-200">
+                        When proving existential statements, carefully construct witnesses (z, τ, M') and verify 
+                        all required properties using refine and multiple sub-goals.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
